@@ -1,0 +1,96 @@
+1)npm init
+
+2)npm i react react-dom
+
+3)npm i @babel/core @babel/plugin-proposal-class-properties @babel/preset-react babel-loader babel-preset-react html-webpack-plugin webpack webpack-cli webpack-dev-server --save-dev
+ or 
+Add it package.json file and do the npm i
+"devDependencies": {
+    "@babel/core": "^7.24.7",
+    "@babel/plugin-proposal-class-properties": "^7.18.6",
+    "@babel/preset-react": "^7.24.7",
+    "babel-loader": "^9.1.3",
+    "babel-preset-react": "^6.24.1",
+    "html-webpack-plugin": "^5.6.0",
+    "webpack": "^5.92.1",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.0.4"
+  }
+
+ 4) add it in script to start the project by npm start
+"start": "webpack serve --config webpack.config.js"
+5) create index.html in public folder
+6) create App.js and index.js in src
+7) Create webpack.config.js
+============================================================================================================================================================
+const HtmlWebPackPlugin = require("html-webpack-plugin");
+const {ModuleFederationPlugin} = require("webpack").container;
+const path = require("path");
+
+const htmlPlugin = new HtmlWebPackPlugin({
+  template: "./public/index.html",
+  filename: "./index.html"
+});
+module.exports = {
+  mode: 'development',
+  devServer: {
+    static: path.join(__dirname, "dist"),
+    port: 3000,
+    historyApiFallback:{
+      index:'/public/index.html'
+    },
+  },
+  module: {
+    rules: [{
+      test: /\.js$/,
+      exclude: /node_modules/,
+      use: {
+        loader: "babel-loader"
+      }
+    }
+    ]
+  },
+  plugins: [
+    htmlPlugin,
+    new ModuleFederationPlugin({
+      name: "Host",
+      filename: "remoteEntry.js",
+      remotes: {
+        MicroFrontend2: "MicroFrontend2@http://localhost:3002/remoteEntry.js",
+        MicroFrontend1: "MicroFrontend1@http://localhost:3001/remoteEntry.js",
+      },
+      exposes:{
+        './Button':'./components/Button'
+      }
+    })
+  ]
+};
+//"./Component01":"./src/components/Component01"
+// MicroFrontend: "MicroFrontend@http://localhost:3000/remoteEntry.js"
+// Checkout: "Checkout@http://localhost:3000/remoteEntry.js"
+============================================================================================================================================================
+
+
+Some importent configurationin webpack.config.js
+ name: "Name of Microfrontend or keep it like Host ( for Container or main)",
+      filename: "remoteEntry.js",
+      remotes: {
+        (Name that you want to access it in your application )MicroFrontend2: "MicroFrontend2(Name of child microfrontend)@http://localhost:3002/remoteEntry.js",
+        MicroFrontend1: "MicroFrontend1@http://localhost:3001/remoteEntry.js",
+      },
+      exposes:{
+        './Button':'./components/Button'(how to expose that our component access by other Microfront and )
+      }
+============================================================================================================================================================
+8)Create .babelrc and copy the given code.
+{
+    "presets": [
+      "@babel/preset-react"
+    ],
+    "plugins": [
+      "@babel/plugin-proposal-class-properties"
+    ]
+  }
+======================================================================================================================================================
+7)Access Component Like
+Const variable_name=React.lazy(()=>import("Name_Of_MicroFrontend/Name_Of_Component"))
