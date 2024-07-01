@@ -94,3 +94,6 @@ Some importent configurationin webpack.config.js
 ======================================================================================================================================================
 7)Access Component Like
 Const variable_name=React.lazy(()=>import("Name_Of_MicroFrontend/Name_Of_Component"))
+
+
+// for more reference https://www.youtube.com/watch?v=-LMQKc4bVSk&t=664s
